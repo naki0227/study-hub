@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Study Hub | Enludus</title>
+
+  <!-- OGP -->
+  <meta property="og:title" content="Study Hub | Enludus" />
+  <meta property="og:description" content="ポモドーロ × 暗記カード × AI。学びを冒険に変える統合学習ツール。" />
+  <meta property="og:type" content="website" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Outfit:wght@300;400;600;700&display=swap"
+    rel="stylesheet">
+</head>
+
+<body>
+  <div id="app">
+    <div class="app-container">
+      <!-- ヘッダー -->
+      <header class="app-header">
+        <div class="app-logo">Study Hub</div>
+        <div class="header-actions">
+          <button class="icon-btn" id="settings-btn" title="設定">⚙️</button>
+          <div class="level-badge">
+            <span>Lv.</span>
+            <span class="level-number" id="level-display">1</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- タイマーセクション -->
+      <section class="timer-section">
+        <!-- モード切り替え -->
+        <div class="mode-tabs">
+          <button class="mode-tab active" data-mode="pomodoro">Pomodoro</button>
+          <button class="mode-tab" data-mode="shortBreak">Short Break</button>
+          <button class="mode-tab" data-mode="longBreak">Long Break</button>
+        </div>
+
+        <!-- タイマー表示 -->
+        <div class="timer-display">
+          <div class="timer-circle" data-mode="pomodoro">
+            <div class="timer-time" id="timer-time">25:00</div>
+            <div class="timer-mode" id="timer-mode-label">Focus Time</div>
+          </div>
+        </div>
+
+        <!-- コントロール -->
+        <div class="timer-controls">
+          <button class="timer-btn secondary" id="reset-btn" title="Reset">↺</button>
+          <button class="timer-btn primary" id="start-btn" title="Start">▶</button>
+        </div>
+      </section>
+
+      <!-- 統計 -->
+      <section class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value" id="stat-sessions">0</div>
+          <div class="stat-label">Sessions</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-time">0h</div>
+          <div class="stat-label">Total</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-streak">0</div>
+          <div class="stat-label">Streak</div>
+        </div>
+      </section>
+
+      <!-- メインタブナビゲーション -->
+      <nav class="main-tabs">
+        <button class="main-tab active" data-tab="timer">⏱️ タイマー</button>
+        <button class="main-tab" data-tab="flashcards">📚 カード</button>
+        <button class="main-tab" data-tab="quiz">🧠 クイズ</button>
+      </nav>
+
+      <!-- タイマータブコンテンツ -->
+      <div id="tab-timer" class="tab-content active">
+        <!-- バッジセクション -->
+        <section class="section">
+          <div class="section-header">
+            <h2 class="section-title">🏆 Badges</h2>
+            <span class="section-action" id="view-all-badges">View All</span>
+          </div>
+          <div class="badges-grid" id="badges-container">
+            <!-- バッジはJSで動的に生成 -->
+          </div>
+        </section>
+
+        <!-- アプリ推薦 -->
+        <section class="section" id="app-recommendation-section">
+          <!-- 完了時に動的に表示 -->
+        </section>
+      </div>
+
+      <!-- 暗記カードタブコンテンツ -->
+      <div id="tab-flashcards" class="tab-content">
+        <div id="flashcards-container"></div>
+      </div>
+
+      <!-- クイズタブコンテンツ -->
+      <div id="tab-quiz" class="tab-content">
+        <div id="quiz-container-main"></div>
+      </div>
+
+      <!-- フッター -->
+      <footer class="app-footer">
+        <p>Powered by <a href="https://enludus.vercel.app" class="enludus-link" target="_blank">Enludus</a></p>
+        <p style="margin-top: 8px;">学びを冒険に。壁を、扉に。</p>
+      </footer>
+    </div>
+  </div>
+
+  <!-- 完了モーダル -->
+  <div class="modal-overlay" id="complete-modal">
+    <div class="modal">
+      <div class="modal-icon" id="modal-icon">🎉</div>
+      <h3 class="modal-title" id="modal-title">セッション完了！</h3>
+      <p class="modal-message" id="modal-message">素晴らしい集中力でした。次も頑張りましょう！</p>
+      <div id="modal-badge-container"></div>
+      <div id="modal-recommendation"></div>
+      <div class="modal-actions">
+        <button class="btn btn-primary" id="modal-continue">続ける</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 設定モーダル -->
+  <div class="modal-overlay" id="settings-modal">
+    <div class="modal" style="max-width: 450px;">
+      <h3 class="modal-title" style="margin-bottom: 24px;">⚙️ 設定</h3>
+
+      <!-- タイマー設定 -->
+      <div class="settings-section">
+        <h4 style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 12px;">タイマー設定</h4>
+        <div class="settings-row">
+          <label>ポモドーロ（分）</label>
+          <input type="number" id="setting-pomodoro" class="input-field" min="1" max="60" value="25"
+            style="width: 80px;">
+        </div>
+        <div class="settings-row">
+          <label>短い休憩（分）</label>
+          <input type="number" id="setting-short-break" class="input-field" min="1" max="30" value="5"
+            style="width: 80px;">
+        </div>
+        <div class="settings-row">
+          <label>長い休憩（分）</label>
+          <input type="number" id="setting-long-break" class="input-field" min="1" max="60" value="15"
+            style="width: 80px;">
+        </div>
+      </div>
+
+      <!-- データ管理 -->
+      <div class="settings-section" style="margin-top: 24px;">
+        <h4 style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 12px;">データ管理</h4>
+        <div class="settings-buttons">
+          <button class="btn btn-secondary" id="export-data-btn" style="flex: 1;">📤 エクスポート</button>
+          <button class="btn btn-secondary" id="import-data-btn" style="flex: 1;">📥 インポート</button>
+        </div>
+        <button class="btn btn-secondary" id="reset-data-btn"
+          style="width: 100%; margin-top: 8px; color: var(--accent-color);">🗑️ データをリセット</button>
+        <input type="file" id="import-file-input" accept=".json" style="display: none;">
+      </div>
+
+      <div class="modal-actions" style="margin-top: 24px;">
+        <button class="btn btn-primary" id="save-settings-btn">保存</button>
+        <button class="btn btn-secondary" id="close-settings-btn">キャンセル</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+
+</html>
