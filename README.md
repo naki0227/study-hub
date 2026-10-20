@@ -121,7 +121,7 @@ graph TD
 **Enludus**
 
 Focus: Lightweight Web Apps & AI Integration
-Contact: <https://enludus.vercel.app>
+Contact: <https://enludus.com>
 
 <p align="center"> 
     © 2025 Study Hub Project. All rights reserved. 
